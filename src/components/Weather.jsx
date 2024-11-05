@@ -142,6 +142,7 @@ const Weather = () => {
             - Alert/Error when user enters wrong data
             - If possible, list up Country, City to keep user experience easier for searching
             - Add "Country code" under the "City name"
+            - Update design and add night with clouds, night rain, night thunder, night snow, etc...
         */}
     </div>
     
