@@ -11,6 +11,8 @@
 }
 .app{
   min-height: 100vh;
-  background-color: #64CDDC;
+  /* background-color: #64CDDC; */
+  background: linear-gradient(#64CDDC, #2432d3);
+  
   display: grid;
 }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.35 34.47">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #4cad8e;
+      }
+
+      .cls-2 {
+        fill: #66c4c6;
+      }
+
+      .cls-3 {
+        fill: #54baaf;
+      }
+
+      .cls-4 {
+        fill: #6eb9bc;
+      }
+
+      .cls-5 {
+        fill: #19619c;
+      }
+
+      .cls-6 {
+        fill: #36b28d;
+      }
+
+      .cls-7 {
+        fill: #202d7c;
+      }
+
+      .cls-8 {
+        fill: #3179a9;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer_1">
+    <g>
+      <g>
+        <g>
+          <polygon class="cls-3" points="0 34.47 4.15 34.47 4.15 30.93 0 29.39 0 34.47"/>
+          <polygon class="cls-1" points="0 25.73 0 29.39 4.15 30.93 4.15 23.54 0 25.73"/>
+          <polygon class="cls-2" points="4.15 0 0 0 0 6.36 4.15 3.93 4.15 0"/>
+          <polygon class="cls-4" points="4.15 18.65 0 16.08 0 25.73 4.15 23.54 4.15 18.65"/>
+          <polygon class="cls-6" points="4.15 3.93 0 6.36 0 16.08 4.15 18.65 4.15 3.93"/>
+        </g>
+        <g>
+          <polygon class="cls-8" points="26.76 11.29 5.72 0 11.66 9.86 26.76 11.29"/>
+          <polygon class="cls-7" points="11.66 9.86 5.72 18.65 26.76 11.29 11.66 9.86"/>
+          <polygon class="cls-5" points="5.72 0 5.72 18.65 11.66 9.86 5.72 0"/>
+        </g>
+      </g>
+      <polygon class="cls-7" points="14.93 16.68 14.93 18.33 30.35 17.77 14.93 16.68"/>
+      <polygon class="cls-5" points="22.25 14.25 22.25 15.91 29.42 15.34 22.25 14.25"/>
+      <polygon class="cls-4" points="14.93 1.8 14.93 .15 30.35 .71 14.93 1.8"/>
+      <polygon class="cls-6" points="22.25 4.23 22.25 2.57 29.42 3.14 22.25 4.23"/>
+    </g>
+  </g>
+</svg>

@@ -12,6 +12,20 @@ import thunder_icon from '../assets/thunder.png'
 import windy_gif from '../assets/wind.gif'
 import wind_icon from '../assets/wind.png'
 
+import cloudy from '../assets/SVGweatherconditions/cloudy.svg'
+import hail from '../assets/SVGweatherconditions/hail.svg'
+import lightrainnight from '../assets/SVGweatherconditions/lightrainnight.svg'
+import night from '../assets/SVGweatherconditions/night.svg'
+import nightsnowfall from '../assets/SVGweatherconditions/nightsnowfall.svg'
+import rain from '../assets/SVGweatherconditions/rain.svg'
+import rainy from '../assets/SVGweatherconditions/rainy.svg'
+import sleet from '../assets/SVGweatherconditions/sleet.svg'
+import snow from '../assets/SVGweatherconditions/snow.svg'
+import sun from '../assets/SVGweatherconditions/sun.svg'
+import temperature from '../assets/SVGweatherconditions/temperature.svg'
+import thunder from '../assets/SVGweatherconditions/thunder.svg'
+import wind from '../assets/SVGweatherconditions/wind.svg'
+
 const Weather = () => {
 
     
@@ -20,28 +34,43 @@ const Weather = () => {
     const inputRef = useRef();
 
     const allIcons = {
-        "01d": sunny_icon,
-        "01n": night_icon,
-        "02d": partiallysunny_icon,
-        "02n": partiallysunny_icon,
-        "03d": partiallysunny_icon,
-        "03n": partiallysunny_icon,
-        "04d": partiallysunny_icon,   
-        "09d": rainy_icon,
-        "09n": rainy_icon, 
-        "10d": rainy_icon,
-        "10n": rainy_icon,     
+        "01d": sun,
+        "01n": night,
+        "02d": cloudy,
+        "02n": cloudy,
+        "03d": cloudy,
+        "03n": cloudy,
+        "04d": cloudy,  
+        "04n": cloudy,   
+
+        "09d": rainy,
+        "09n": rainy,
+        "10d": rainy,
+        "10n": rainy,
+
+        "11d": thunder,
+        "11n": thunder,
+
+        "13d": snow,
+        "13n": snow,
+
+        "50d": hail,
+        "50n": hail,
+
+           
     }
     const search = async (city)=> {
-        if(city === ""){
-            alert
-        }
+        // if(city === ""){
+        //     alert
+        // }
         try {
             const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
 
             const response = await fetch(url);
             const data = await response.json();
-            console.log(data.weather[0].icon);
+            console.log(data);
+            
+            // console.log(data.weather[0].icon);
 
             const icon = allIcons[data.weather[0].icon];
 
@@ -50,7 +79,9 @@ const Weather = () => {
                 windSpeed: data.wind.speed,
                 temperature: Math.floor(data.main.temp),
                 location: data.name,
-                icon: data.weather[0].icon,
+                country: data.sys.country,
+                icon: icon,
+                // data.weather[0].icon
                 
             })
 
@@ -79,11 +110,12 @@ const Weather = () => {
             <img src={search_grey_icon}  onClick={()=>search(inputRef.current.value)} alt="search" />
         </div>
 
-        {/* <img src={weatherData.icon} alt="" className='weather-icon'/> */}
-        <img src={`https://openweathermap.org/img/wn/${weatherData.icon}@2x.png`} alt="" className='weather-icon'/>
+        <img src={weatherData.icon} alt="" className='weather-icon'/>
+        {/* <img src={`https://openweathermap.org/img/wn/${weatherData.icon}@2x.png`} alt="" className='weather-icon'/> */}
 
         <p className='temperature'>{weatherData.temperature}°C</p>
         <p className='location'>{weatherData.location}</p>
+        
 
         <div className="weather-data">
             <div className="col">
@@ -109,6 +141,7 @@ const Weather = () => {
             - Fetch the expected next 5 days and add
             - Alert/Error when user enters wrong data
             - If possible, list up Country, City to keep user experience easier for searching
+            - Add "Country code" under the "City name"
         */}
     </div>
     
