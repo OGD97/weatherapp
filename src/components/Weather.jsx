@@ -25,6 +25,10 @@ import sun from '../assets/SVGweatherconditions/sun.svg'
 import temperature from '../assets/SVGweatherconditions/temperature.svg'
 import thunder from '../assets/SVGweatherconditions/thunder.svg'
 import wind from '../assets/SVGweatherconditions/wind.svg'
+import cloudy_night from '../assets/SVGweatherconditions/cloudy_night.svg'
+import mist from '../assets/SVGweatherconditions/mist.svg'
+import rainy_night from '../assets/SVGweatherconditions/rainy_night.svg'
+import rainy_sun from '../assets/SVGweatherconditions/rainy_sun.svg'
 
 const Weather = () => {
 
@@ -37,16 +41,16 @@ const Weather = () => {
         "01d": sun,
         "01n": night,
         "02d": cloudy,
-        "02n": cloudy,
+        "02n": cloudy_night,
         "03d": cloudy,
-        "03n": cloudy,
+        "03n": cloudy_night,
         "04d": cloudy,  
-        "04n": cloudy,   
+        "04n": cloudy_night,   
 
         "09d": rainy,
-        "09n": rainy,
+        "09n": rainy_night,
         "10d": rainy,
-        "10n": rainy,
+        "10n": rainy_night,
 
         "11d": thunder,
         "11n": thunder,
@@ -54,8 +58,8 @@ const Weather = () => {
         "13d": snow,
         "13n": snow,
 
-        "50d": hail,
-        "50n": hail,
+        "50d": mist,
+        "50n": mist,
 
            
     }
@@ -82,12 +86,47 @@ const Weather = () => {
                 country: data.sys.country,
                 icon: icon,
                 // data.weather[0].icon
+                sunrise: data.sys.sunrise,
+                timezone: data.timezone,
+                visibility: data.visibility
                 
             })
+
+
+            // console.log(weatherData.timezone);
+            // console.log(weatherData.sunrise);
+            
+            // var date = new Date();
+            // console.log(date);
+
+            // const bobo = Intl.DateTimeFormat().resolvedOptions();
+            // console.log(bobo);
+            
 
         } catch (error) {
             
         }}
+
+
+        // msToTime(weatherData.sunrise);
+
+
+        // timezone function
+        function msToTime(s) {
+
+            x = ms / 1000
+            seconds = x % 60
+            x /= 60
+            minutes = x % 60
+            x /= 60
+            hours = x % 24
+            x /= 24
+            days = x
+              console.log(hours + ":" + minutes + ":" + seconds)
+            return hours + ":" + minutes + ":" + seconds
+          }
+          
+          
     
 
     useEffect(()=>{
@@ -115,6 +154,8 @@ const Weather = () => {
 
         <p className='temperature'>{weatherData.temperature}°C</p>
         <p className='location'>{weatherData.location}</p>
+        <p className='country'>{weatherData.country}</p>
+        {/* <p className='country'>{weatherData.time}</p> */}
         
 
         <div className="weather-data">
@@ -143,6 +184,8 @@ const Weather = () => {
             - If possible, list up Country, City to keep user experience easier for searching
             - Add "Country code" under the "City name"
             - Update design and add night with clouds, night rain, night thunder, night snow, etc...
+            - Fahrenheit conversion
+            - Add pressure, feels like, and other features found in main, timezone and so forth
         */}
     </div>
     
