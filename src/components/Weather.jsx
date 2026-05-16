@@ -30,10 +30,20 @@ import mist from '../assets/SVGweatherconditions/mist.svg'
 import rainy_night from '../assets/SVGweatherconditions/rainy_night.svg'
 import rainy_sun from '../assets/SVGweatherconditions/rainy_sun.svg'
 
+
+import Clock from './Clock'
+
+// import TimestamptoDateTime from './TimestamptoDateTime'
+
+
 const Weather = () => {
 
     
     const [weatherData, setWeatherData] = useState(false);
+    const [forecastData, setForecastData] = useState([]);
+
+
+   
 
     const inputRef = useRef();
 
@@ -68,11 +78,25 @@ const Weather = () => {
         //     alert
         // }
         try {
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
+            const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
 
-            const response = await fetch(url);
-            const data = await response.json();
+            const [weatherResponse, forecastResponse] = await Promise.all([
+                fetch(weatherUrl),
+                fetch(forecastUrl)
+            ]);
+
+            const data = await weatherResponse.json();
+            const forecastJson = await forecastResponse.json();
             console.log(data);
+
+            if (forecastJson.list) {
+                // Get 1 reading per day (at 12:00:00 PM)
+                const dailyData = forecastJson.list.filter(reading => reading.dt_txt.includes("12:00:00"));
+                setForecastData(dailyData);
+            } else {
+                setForecastData([]);
+            }
             
             // console.log(data.weather[0].icon);
 
@@ -91,10 +115,13 @@ const Weather = () => {
                 visibility: data.visibility
                 
             })
+            
 
 
-            // console.log(weatherData.timezone);
-            // console.log(weatherData.sunrise);
+
+            console.log(weatherData.timezone);
+            console.log(weatherData.sunrise);
+            console.log(weatherData.visibility);
             
             // var date = new Date();
             // console.log(date);
@@ -108,24 +135,13 @@ const Weather = () => {
         }}
 
 
-        // msToTime(weatherData.sunrise);
+        // const TstoHuman = TimestamptoDateTime(weatherData.sunrise);
+        // console.log(TstoHuman); 
+
+        
 
 
-        // timezone function
-        function msToTime(s) {
 
-            x = ms / 1000
-            seconds = x % 60
-            x /= 60
-            minutes = x % 60
-            x /= 60
-            hours = x % 24
-            x /= 24
-            days = x
-              console.log(hours + ":" + minutes + ":" + seconds)
-            return hours + ":" + minutes + ":" + seconds
-          }
-          
           
     
 
@@ -156,6 +172,14 @@ const Weather = () => {
         <p className='location'>{weatherData.location}</p>
         <p className='country'>{weatherData.country}</p>
         {/* <p className='country'>{weatherData.time}</p> */}
+
+
+<div className="time-info">
+    <Clock />
+    {weatherData.sunrise && <p className='sunrise-text'>Sunrise: {new Date(weatherData.sunrise * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>}
+</div>
+        
+
         
 
         <div className="weather-data">
@@ -177,6 +201,41 @@ const Weather = () => {
                 </div>
             </div>
         </div>
+
+        {forecastData && forecastData.length > 0 && (
+            <div className="forecast-container">
+                <h3 className="forecast-title">5-Day Forecast</h3>
+                <div className="forecast-table-wrapper">
+                    <table className="forecast-table">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Weather</th>
+                                <th>Temp</th>
+                                <th>Wind</th>
+                                <th>Humidity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {forecastData.map((day, index) => {
+                                const date = new Date(day.dt * 1000);
+                                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                                const icon = allIcons[day.weather[0].icon] || sun;
+                                return (
+                                    <tr key={index}>
+                                        <td className="fw-bold">{dayName}</td>
+                                        <td><img src={icon} alt="icon" className="forecast-icon" /></td>
+                                        <td>{Math.floor(day.main.temp)}°C</td>
+                                        <td>{Math.floor(day.wind.speed)} km/h</td>
+                                        <td>{day.main.humidity}%</td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        )}
 
         {/* TO DO:
             - Fetch the expected next 5 days and add
