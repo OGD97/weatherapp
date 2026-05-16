@@ -50,13 +50,13 @@ const Weather = () => {
 
     const allIcons = {
         "01d": sun, "01n": night, "02d": cloudy, "02n": cloudy_night,
-        "03d": cloudy, "03n": cloudy_night, "04d": cloudy, "04n": cloudy_night,   
+        "03d": cloudy, "03n": cloudy_night, "04d": cloudy, "04n": cloudy_night,
         "09d": rainy, "09n": rainy_night, "10d": rainy, "10n": rainy_night,
         "11d": thunder, "11n": thunder, "13d": snow, "13n": snow,
         "50d": mist, "50n": mist,
     }
 
-    const search = async (city)=> {
+    const search = async (city) => {
         try {
             const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
             const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
@@ -68,7 +68,7 @@ const Weather = () => {
 
             const data = await weatherResponse.json();
             const forecastJson = await forecastResponse.json();
-            
+
             if (forecastJson.list) {
                 const dailyData = forecastJson.list.filter(reading => reading.dt_txt.includes("12:00:00"));
                 setForecastData(dailyData);
@@ -98,108 +98,108 @@ const Weather = () => {
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         search("Wiesbaden");
-    },[])
+    }, [])
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
-          search(inputRef.current.value)
+            search(inputRef.current.value)
         }
     }
-  
-  return (
-    <div className='weather'>
-        <div className="search-bar">
-            <input ref={inputRef} type="text" placeholder='Search' onKeyDown={handleKeyDown} />
-            <img src={search_grey_icon}  onClick={()=>search(inputRef.current.value)} alt="search" />
-        </div>
 
-        {weatherData && (
-            <div className="weather-layout">
-                {/* Left Column: Current Weather */}
-                <div className="weather-left">
-                    <img src={weatherData.icon} alt="" className='weather-icon'/>
-                    <p className='temperature'>{weatherData.temperature}°C</p>
-                    <p className='weather-description' style={{textTransform: 'capitalize', color: '#666', fontSize: '1.2rem', marginBottom: '5px', fontWeight: '600'}}>{weatherData.description}</p>
-                    <p className='location'>{weatherData.location}, {weatherData.country}</p>
-                    <div className="time-info">
-                        <Clock timezone={weatherData.timezone} />
-                    </div>
-                </div>
+    return (
+        <div className='weather'>
+            <div className="search-bar">
+                <input ref={inputRef} type="text" placeholder='Search' onKeyDown={handleKeyDown} />
+                <img src={search_grey_icon} onClick={() => search(inputRef.current.value)} alt="search" />
+            </div>
 
-                {/* Right Column: Grid & Forecast */}
-                <div className="weather-right">
-                    <div className="weather-data-grid">
-                        <div className="data-item">
-                            <span className="data-label">Feels Like</span>
-                            <span className="data-value">{weatherData.feelsLike}°C</span>
-                        </div>
-                        <div className="data-item">
-                            <span className="data-label">Humidity</span>
-                            <span className="data-value">{weatherData.humidity}%</span>
-                        </div>
-                        <div className="data-item">
-                            <span className="data-label">Wind</span>
-                            <span className="data-value">{weatherData.windSpeed} km/h</span>
-                        </div>
-                        <div className="data-item">
-                            <span className="data-label">Pressure</span>
-                            <span className="data-value">{weatherData.pressure} hPa</span>
-                        </div>
-                        <div className="data-item">
-                            <span className="data-label">Visibility</span>
-                            <span className="data-value">{(weatherData.visibility / 1000).toFixed(1)} km</span>
-                        </div>
-                        <div className="data-item">
-                            <span className="data-label">Sun</span>
-                            <span className="data-value" style={{fontSize: '14px', lineHeight: '1.4'}}>
-                                {formatLocalTime(weatherData.sunrise, weatherData.timezone)}
-                                <br/>
-                                {formatLocalTime(weatherData.sunset, weatherData.timezone)}
-                            </span>
+            {weatherData && (
+                <div className="weather-layout">
+                    {/* Left Column: Current Weather */}
+                    <div className="weather-left">
+                        <img src={weatherData.icon} alt="" className='weather-icon' />
+                        <p className='temperature'>{weatherData.temperature}°C</p>
+                        <p className='weather-description' style={{ textTransform: 'capitalize', color: '#666', fontSize: '1.2rem', marginBottom: '5px', fontWeight: '600' }}>{weatherData.description}</p>
+                        <p className='location'>{weatherData.location}, {weatherData.country}</p>
+                        <div className="time-info">
+                            <Clock timezone={weatherData.timezone} />
                         </div>
                     </div>
 
-                    {forecastData && forecastData.length > 0 && (
-                        <div className="forecast-container">
-                            <h3 className="forecast-title">5-Day Forecast</h3>
-                            <div className="forecast-table-wrapper">
-                                <table className="forecast-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Day</th>
-                                            <th>Weather</th>
-                                            <th>Temp</th>
-                                            <th>Wind</th>
-                                            <th>Humidity</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {forecastData.map((day, index) => {
-                                            const date = new Date(day.dt * 1000);
-                                            const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-                                            const icon = allIcons[day.weather[0].icon] || sun;
-                                            return (
-                                                <tr key={index}>
-                                                    <td className="fw-bold">{dayName}</td>
-                                                    <td><img src={icon} alt="icon" className="forecast-icon" /></td>
-                                                    <td>{Math.floor(day.main.temp)}°C</td>
-                                                    <td>{Math.floor(day.wind.speed)} km/h</td>
-                                                    <td>{day.main.humidity}%</td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
+                    {/* Right Column: Grid & Forecast */}
+                    <div className="weather-right">
+                        <div className="weather-data-grid">
+                            <div className="data-item">
+                                <span className="data-label">Feels Like</span>
+                                <span className="data-value">{weatherData.feelsLike}°C</span>
+                            </div>
+                            <div className="data-item">
+                                <span className="data-label">Humidity</span>
+                                <span className="data-value">{weatherData.humidity}%</span>
+                            </div>
+                            <div className="data-item">
+                                <span className="data-label">Wind</span>
+                                <span className="data-value">{weatherData.windSpeed} km/h</span>
+                            </div>
+                            <div className="data-item">
+                                <span className="data-label">Pressure</span>
+                                <span className="data-value">{weatherData.pressure} hPa</span>
+                            </div>
+                            <div className="data-item">
+                                <span className="data-label">Visibility</span>
+                                <span className="data-value">{(weatherData.visibility / 1000).toFixed(1)} km</span>
+                            </div>
+                            <div className="data-item">
+                                <span className="data-label">Sunset & Sunrise</span>
+                                <span className="data-value" style={{ fontSize: '14px', lineHeight: '1.4' }}>
+                                    {formatLocalTime(weatherData.sunrise, weatherData.timezone)}
+                                    <br />
+                                    {formatLocalTime(weatherData.sunset, weatherData.timezone)}
+                                </span>
                             </div>
                         </div>
-                    )}
+
+                        {forecastData && forecastData.length > 0 && (
+                            <div className="forecast-container">
+                                <h3 className="forecast-title">5-Day Forecast</h3>
+                                <div className="forecast-table-wrapper">
+                                    <table className="forecast-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Day</th>
+                                                <th>Weather</th>
+                                                <th>Temp</th>
+                                                <th>Wind</th>
+                                                <th>Humidity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {forecastData.map((day, index) => {
+                                                const date = new Date(day.dt * 1000);
+                                                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                                                const icon = allIcons[day.weather[0].icon] || sun;
+                                                return (
+                                                    <tr key={index}>
+                                                        <td className="fw-bold">{dayName}</td>
+                                                        <td><img src={icon} alt="icon" className="forecast-icon" /></td>
+                                                        <td>{Math.floor(day.main.temp)}°C</td>
+                                                        <td>{Math.floor(day.wind.speed)} km/h</td>
+                                                        <td>{day.main.humidity}%</td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
-        )}
-    </div>
-  )
+            )}
+        </div>
+    )
 }
 
 export default Weather
