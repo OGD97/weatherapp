@@ -43,6 +43,18 @@ const formatLocalTime = (unixTimestamp, timezoneOffset) => {
     return `${hours}:${minutes} ${ampm}`;
 };
 
+const mapWmoToOwmIconCode = (wmoCode, isDay = true) => {
+    const suffix = isDay ? "d" : "n";
+    if (wmoCode === 0) return "01" + suffix;
+    if ([1, 2, 3].includes(wmoCode)) return "02" + suffix;
+    if ([45, 48].includes(wmoCode)) return "50" + suffix;
+    if ([51, 53, 55, 80, 81, 82].includes(wmoCode)) return "09" + suffix;
+    if ([61, 63, 65].includes(wmoCode)) return "10" + suffix;
+    if ([56, 57, 66, 67, 71, 73, 75, 77, 85, 86].includes(wmoCode)) return "13" + suffix;
+    if ([95, 96, 99].includes(wmoCode)) return "11" + suffix;
+    return "01" + suffix;
+};
+
 const Weather = () => {
     const [weatherData, setWeatherData] = useState(false);
     const [forecastData, setForecastData] = useState([]);
@@ -59,19 +71,55 @@ const Weather = () => {
     const search = async (city) => {
         try {
             const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
-            const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
-
-            const [weatherResponse, forecastResponse] = await Promise.all([
-                fetch(weatherUrl),
-                fetch(forecastUrl)
-            ]);
-
+            const weatherResponse = await fetch(weatherUrl);
             const data = await weatherResponse.json();
+
+            if (data.cod && data.cod !== 200) {
+                console.error(data.message || "Error fetching weather data");
+                return;
+            }
+
+            const { lat, lon } = data.coord;
+            const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,relative_humidity_2m_max&hourly=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&timezone=auto`;
+            const forecastResponse = await fetch(forecastUrl);
             const forecastJson = await forecastResponse.json();
 
-            if (forecastJson.list) {
-                const dailyData = forecastJson.list.filter(reading => reading.dt_txt.includes("12:00:00"));
-                setForecastData(dailyData);
+            if (forecastJson.daily && forecastJson.hourly) {
+                const daily = forecastJson.daily;
+                const hourly = forecastJson.hourly;
+                const formattedForecast = daily.time.map((timeStr, index) => {
+                    const date = new Date(timeStr);
+                    const dt = Math.floor(date.getTime() / 1000);
+                    
+                    // Indices for 12:00 PM (Noon/Day) and 11:00 PM (Night)
+                    const morningHourIndex = index * 24 + 12;
+                    const nightHourIndex = index * 24 + 23;
+                    
+                    const morningWmo = hourly.weather_code[morningHourIndex] !== undefined ? hourly.weather_code[morningHourIndex] : daily.weather_code[index];
+                    const morningIconCode = mapWmoToOwmIconCode(morningWmo, true);
+                    
+                    const nightWmo = hourly.weather_code[nightHourIndex] !== undefined ? hourly.weather_code[nightHourIndex] : daily.weather_code[index];
+                    const nightIconCode = mapWmoToOwmIconCode(nightWmo, false);
+                    
+                    return {
+                        dt,
+                        morning: {
+                            temp: daily.temperature_2m_max[index],
+                            icon: morningIconCode
+                        },
+                        night: {
+                            temp: daily.temperature_2m_min[index],
+                            icon: nightIconCode
+                        },
+                        main: {
+                            humidity: daily.relative_humidity_2m_max[index]
+                        },
+                        wind: {
+                            speed: daily.wind_speed_10m_max[index]
+                        }
+                    };
+                });
+                setForecastData(formattedForecast);
             } else {
                 setForecastData([]);
             }
@@ -163,14 +211,14 @@ const Weather = () => {
 
                         {forecastData && forecastData.length > 0 && (
                             <div className="forecast-container">
-                                <h3 className="forecast-title">5-Day Forecast</h3>
+                                <h3 className="forecast-title">7-Day Forecast</h3>
                                 <div className="forecast-table-wrapper">
                                     <table className="forecast-table">
                                         <thead>
                                             <tr>
                                                 <th>Day</th>
-                                                <th>Weather</th>
-                                                <th>Temp</th>
+                                                <th>Morning</th>
+                                                <th>Night</th>
                                                 <th>Wind</th>
                                                 <th>Humidity</th>
                                             </tr>
@@ -179,12 +227,23 @@ const Weather = () => {
                                             {forecastData.map((day, index) => {
                                                 const date = new Date(day.dt * 1000);
                                                 const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-                                                const icon = allIcons[day.weather[0].icon] || sun;
+                                                const morningIcon = allIcons[day.morning.icon] || sun;
+                                                const nightIcon = allIcons[day.night.icon] || night;
                                                 return (
                                                     <tr key={index}>
                                                         <td className="fw-bold">{dayName}</td>
-                                                        <td><img src={icon} alt="icon" className="forecast-icon" /></td>
-                                                        <td>{Math.floor(day.main.temp)}°C</td>
+                                                        <td>
+                                                            <div className="forecast-cell-content">
+                                                                <img src={morningIcon} alt="morning icon" className="forecast-icon" />
+                                                                <span>{Math.floor(day.morning.temp)}°C</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="forecast-cell-content">
+                                                                <img src={nightIcon} alt="night icon" className="forecast-icon" />
+                                                                <span>{Math.floor(day.night.temp)}°C</span>
+                                                            </div>
+                                                        </td>
                                                         <td>{Math.floor(day.wind.speed)} km/h</td>
                                                         <td>{day.main.humidity}%</td>
                                                     </tr>

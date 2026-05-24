@@ -244,6 +244,13 @@
     background-color: #e2e8f0;
 }
 
+.forecast-cell-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
 .forecast-icon {
     width: 35px;
     height: 35px;
